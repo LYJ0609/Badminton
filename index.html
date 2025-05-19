@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>괜찮아! 배려민턴</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+    }
+    #main-container {
+      flex: 1;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+    #result-page {
+      flex: 1;
+      padding: 40px;
+      box-sizing: border-box;
+      background-color: #f9f9f9;
+      overflow-y: auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    .team-buttons button {
+      margin: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="main-container">
+    <h1>괜찮아! 배려민턴</h1>
+
+    <div id="login-page">
+      <input type="text" id="grade" placeholder="학년" required>
+      <input type="text" id="class" placeholder="반" required>
+      <div class="team-buttons">
+        <span>팀 선택:</span>
+        <button onclick="selectTeam('A')">A팀</button>
+        <button onclick="selectTeam('B')">B팀</button>
+        <button onclick="selectTeam('C')">C팀</button>
+      </div>
+    </div>
+
+    <div id="record-page" style="display:none">
+      <p id="student-info"></p>
+      <label>몇 번 성공했나요?</label>
+      <input type="number" id="record-count" min="0">
+      <button onclick="submitRecord()">기록하기</button>
+      <button onclick="goBack()">뒤로</button>
+    </div>
+  </div>
+
+  <div id="result-page">
+    <h2>학급별 최고 기록</h2>
+    <table>
+      <thead>
+        <tr><th>학년</th><th>반</th><th>팀</th><th>최고 기록</th></tr>
+      </thead>
+      <tbody id="result-table"></tbody>
+    </table>
+  </div>
+
+  <script>
+    let records = {};
+    let currentKey = "";
+
+    // 저장된 기록 불러오기
+    window.onload = function() {
+      const saved = localStorage.getItem("badmintonRecords");
+      if (saved) {
+        records = JSON.parse(saved);
+        updateResultTable();
+      }
+    };
+
+    function selectTeam(team) {
+      const grade = document.getElementById("grade").value;
+      const classNum = document.getElementById("class").value;
+      if (!grade || !classNum) return alert("학년과 반을 입력해주세요");
+
+      currentKey = `${grade}-${classNum}-${team}`;
+      document.getElementById("student-info").innerText = `${grade}학년 ${classNum}반 ${team}팀`;
+      document.getElementById("login-page").style.display = "none";
+      document.getElementById("record-page").style.display = "block";
+    }
+
+    function submitRecord() {
+      const count = parseInt(document.getElementById("record-count").value);
+      if (isNaN(count)) return alert("숫자를 입력해주세요");
+
+      if (!records[currentKey] || count > records[currentKey]) {
+        records[currentKey] = count;
+        localStorage.setItem("badmintonRecords", JSON.stringify(records)); // 저장
+      }
+
+      updateResultTable();
+
+      document.getElementById("record-page").style.display = "none";
+      document.getElementById("login-page").style.display = "block";
+      document.getElementById("grade").value = "";
+      document.getElementById("class").value = "";
+      document.getElementById("record-count").value = "";
+    }
+
+    function updateResultTable() {
+      const tbody = document.getElementById("result-table");
+      tbody.innerHTML = "";
+
+      const sortedKeys = Object.keys(records).sort((a, b) => records[b] - records[a]);
+      for (const key of sortedKeys) {
+        const [grade, classNum, team] = key.split("-");
+        const row = `<tr><td>${grade}</td><td>${classNum}</td><td>${team}</td><td>${records[key]}</td></tr>`;
+        tbody.innerHTML += row;
+      }
+    }
+
+    function goBack() {
+      document.getElementById("record-page").style.display = "none";
+      document.getElementById("login-page").style.display = "block";
+      document.getElementById("record-count").value = "";
+    }
+  </script>
+</body>
+</html>
