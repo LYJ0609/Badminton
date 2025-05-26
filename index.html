@@ -16,19 +16,12 @@
       flex: 1;
       padding: 40px;
       box-sizing: border-box;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
     }
     #result-page {
       flex: 1;
       padding: 40px;
       box-sizing: border-box;
       background-color: #f9f9f9;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
       overflow-y: auto;
     }
     h1 {
@@ -39,10 +32,6 @@
       padding: 10px;
       margin: 10px;
       font-size: 16px;
-      text-align: center;
-    }
-    .team-buttons {
-      text-align: center;
     }
     .team-buttons button {
       margin: 5px;
@@ -63,8 +52,8 @@
     <h1>괜찮아! 배려민턴</h1>
 
     <div id="login-page">
-      <input type="number" id="grade" placeholder="학년" required>
-      <input type="number" id="class" placeholder="반" required>
+      <input type="text" id="grade" placeholder="학년" required>
+      <input type="text" id="class" placeholder="반" required>
       <div class="team-buttons">
         <span>팀 선택:</span>
         <button onclick="selectTeam('A')">A팀</button>
@@ -96,6 +85,7 @@
     let records = {};
     let currentKey = "";
 
+    // 저장된 기록 불러오기
     window.onload = function() {
       const saved = localStorage.getItem("badmintonRecords");
       if (saved) {
@@ -121,7 +111,7 @@
 
       if (!records[currentKey] || count > records[currentKey]) {
         records[currentKey] = count;
-        localStorage.setItem("badmintonRecords", JSON.stringify(records));
+        localStorage.setItem("badmintonRecords", JSON.stringify(records)); // 저장
       }
 
       updateResultTable();
